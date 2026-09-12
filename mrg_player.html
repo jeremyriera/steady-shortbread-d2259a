@@ -188,7 +188,8 @@
           rel: 0,
           modestbranding: 1,
           disablekb: 1,
-          iv_load_policy: 3
+          iv_load_policy: 3,
+          cc_load_policy: 0
         },
         events: {
           'onReady': setupControls,
@@ -197,12 +198,17 @@
       });
     }
 
-    function setupControls() {
+function setupControls() {
       const playBtn = document.getElementById('play-pause-btn');
       const muteBtn = document.getElementById('mute-btn');
       const volumeSlider = document.getElementById('volume-slider');
       const speedSelect = document.getElementById('speed-select');
       const ccBtn = document.getElementById('cc-btn');
+
+      // Ensure captions start disabled
+      try {
+        player.unloadModule('captions');
+      } catch (e) {}
 
       // Play / Pause Toggle
       playBtn.addEventListener('click', () => {
