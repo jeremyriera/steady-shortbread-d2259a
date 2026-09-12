@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Video Player</title>
+    <title>MRG Video Player</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
@@ -63,10 +63,69 @@
       <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/>
     </svg>
     
-    Back to Newsletter
   </a>
 </div>
 
+<!-- Header Controls (Substack Button + Language Selector) -->
+<div style="max-width: 800px; margin: 20px auto 12px auto; padding: 0 10px; display: flex; justify-content: space-between; align-items: center; gap: 12px; box-sizing: border-box;">
+  
+  <!-- Substack Back Button -->
+  <a id="back-to-substack" 
+     href="https://jeremypaul23.substack.com" 
+     title="Return to Substack"
+     style="
+       display: inline-flex;
+       align-items: center;
+       gap: 8px;
+       padding: 8px 14px;
+       background-color: #ffffff;
+       color: #FF6719;
+       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+       font-size: 14px;
+       font-weight: 600;
+       text-decoration: none;
+       border-radius: 8px;
+       border: 1px solid #ffe0d0;
+       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+       transition: transform 0.15s ease, background-color 0.15s ease;
+     "
+     onmouseover="this.style.transform='scale(1.03)'; this.style.backgroundColor='#fff5f0';"
+     onmouseout="this.style.transform='scale(1)'; this.style.backgroundColor='#ffffff';">
+    
+    <!-- Substack Bookmark SVG Icon -->
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="#FF6719" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/>
+    </svg>
+    
+    Back to Newsletter
+  </a>
+
+  <!-- Language Selector Dropdown -->
+  <select id="language-picker" 
+          aria-label="Select language"
+          style="
+            padding: 8px 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            outline: none;
+            cursor: pointer;
+          ">
+    <option value="es" selected>Español</option>
+    <option value="en">English</option>
+    <option value="fr">Français</option>
+    <option value="de">Deutsch</option>
+    <option value="pt">Português</option>
+    <option value="zh">中文</option>
+    <option value="ja">日本語</option>
+    <option value="ko">한국어</option>
+  </select>
+</div> 
 <!-- Container where the YouTube iframe will be loaded -->
 <div id="video-container"></div>
 
