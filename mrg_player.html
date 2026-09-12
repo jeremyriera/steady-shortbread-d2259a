@@ -13,6 +13,34 @@
      title="Return to Substack"
      style="
        display: inline-flex;
+      <script>
+  // Extract parameters from the current URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const videoId = urlParams.get('video');
+
+  // Update the Back to Substack button destination dynamically
+  const returnTarget = urlParams.get('return');
+  const backButton = document.getElementById('back-to-substack');
+
+  if (backButton) {
+    if (returnTarget) {
+      // If the parameter is a full URL, use it directly; if it's a path, prefix your domain
+      backButton.href = returnTarget.startsWith('http') 
+        ? returnTarget 
+        : 'https://jeremypaul23.substack.com' + returnTarget;
+    } else if (document.referrer && document.referrer.includes('jeremypaul23.substack.com')) {
+      // Fallback to referrer if available
+      backButton.href = document.referrer;
+    } else {
+      // Default fallback to publication homepage
+      backButton.href = 'https://jeremypaul23.substack.com';
+    }
+  }
+
+  if (videoId) {
+    // Create the iframe dynamically using the parsed video ID
+    const iframe = document.createElement('iframe');
+    // ... rest of your code ...
        align-items: center;
        gap: 8px;
        padding: 8px 14px;
