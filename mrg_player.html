@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Player</title>
+</head>
+<body>
+
+    <!-- Container where the YouTube iframe will be loaded -->
+    <div id="video-container"></div>
+
+    <script>
+        // Extract parameters from the current URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('video');
+
+        if (videoId) {
+            // Create the iframe dynamically using the parsed video ID
+            const iframe = document.createElement('iframe');
+            iframe.width = "560";
+            iframe.height = "315";
+            iframe.src = `https://www.youtube.com/embed/${videoId}`;
+            iframe.title = "YouTube video player";
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+            iframe.allowFullscreen = true;
+
+            // Append iframe to the container
+            document.getElementById('video-container').appendChild(iframe);
+        } else {
+            document.getElementById('video-container').innerText = "No video specified.";
+        }
+    </script>
+
+</body>
+</html>
