@@ -19,14 +19,16 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 6px;
       color: #ffffff;
-      padding: 6px 12px;
-      font-size: 14px;
+      padding: 8px 12px;
+      font-size: 15px;
       font-weight: 500;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       transition: background 0.15s ease;
+      min-width: 40px;
+      box-sizing: border-box;
     }
     .ctrl-btn:hover {
       background: rgba(255, 255, 255, 0.1);
@@ -40,10 +42,46 @@
       color: #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 6px;
-      padding: 6px 10px;
+      padding: 7px 8px;
       font-size: 13px;
       cursor: pointer;
       outline: none;
+    }
+
+    /* Vertical volume popup container */
+    .vol-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .vol-slider-wrapper {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 12px 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+    }
+    .vol-container:hover .vol-slider-wrapper,
+    .vol-container:focus-within .vol-slider-wrapper,
+    .vol-container.show-slider .vol-slider-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .vertical-slider {
+      writing-mode: vertical-lr;
+      direction: rtl;
+      width: 100px;
+      accent-color: #FF6719;
+      cursor: pointer;
+      margin: 0;
     }
   </style>
 </head>
@@ -121,33 +159,32 @@
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 16px;
-    padding: 12px 20px;
+    justify-content: space-evenly;
+    gap: 8px;
+    padding: 10px 12px;
     box-sizing: border-box;
     z-index: 9999;
   ">
-    <!-- Play/Pause -->
-    <button id="play-pause-btn" class="ctrl-btn" title="Play / Pause">▶ Play</button>
+    <!-- Play/Pause Button (Icon Only) -->
+    <button id="play-pause-btn" class="ctrl-btn" title="Play / Pause">▶</button>
 
-    <!-- Volume -->
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <button id="mute-btn" class="ctrl-btn" title="Mute / Unmute" style="padding: 6px 10px;">🔊</button>
-      <input type="range" id="volume-slider" min="0" max="100" value="100" style="width: 85px; accent-color: #FF6719; cursor: pointer;">
+    <!-- Volume Button with Vertical Popup Slider -->
+    <div class="vol-container" id="vol-container">
+      <button id="mute-btn" class="ctrl-btn" title="Volume / Mute">🔊</button>
+      <div class="vol-slider-wrapper">
+        <input type="range" id="volume-slider" class="vertical-slider" min="0" max="100" value="100">
+      </div>
     </div>
 
-    <!-- Playback Speed -->
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <span style="font-size: 13px; color: #94a3b8;">Speed:</span>
-      <select id="speed-select" class="ctrl-select">
-        <option value="0.5">0.5x</option>
-        <option value="0.75">0.75x</option>
-        <option value="1" selected>1.0x</option>
-        <option value="1.25">1.25x</option>
-        <option value="1.5">1.5x</option>
-        <option value="2">2.0x</option>
-      </select>
-    </div>
+    <!-- Playback Speed Dropdown (Numbers Only) -->
+    <select id="speed-select" class="ctrl-select" aria-label="Playback Speed">
+      <option value="0.5">0.5×</option>
+      <option value="0.75">0.75×</option>
+      <option value="1" selected>1.0×</option>
+      <option value="1.25">1.25×</option>
+      <option value="1.5">1.5×</option>
+      <option value="2">2.0×</option>
+    </select>
 
     <!-- Captions (CC) -->
     <button id="cc-btn" class="ctrl-btn" title="Toggle Captions">CC</button>
@@ -198,17 +235,36 @@
       });
     }
 
-function setupControls() {
+    function setupControls() {
       const playBtn = document.getElementById('play-pause-btn');
       const muteBtn = document.getElementById('mute-btn');
       const volumeSlider = document.getElementById('volume-slider');
       const speedSelect = document.getElementById('speed-select');
       const ccBtn = document.getElementById('cc-btn');
+      const volContainer = document.getElementById('vol-container');
 
       // Ensure captions start disabled
       try {
         player.unloadModule('captions');
       } catch (e) {}
+
+      // Toggle volume popup on mobile tap
+      muteBtn.addEventListener('click', (e) => {
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+          volContainer.classList.toggle('show-slider');
+        } else {
+          // Desktop click toggles mute
+          if (player.isMuted()) {
+            player.unMute();
+            muteBtn.textContent = '🔊';
+            volumeSlider.value = player.getVolume() || 100;
+          } else {
+            player.mute();
+            muteBtn.textContent = '🔇';
+            volumeSlider.value = 0;
+          }
+        }
+      });
 
       // Play / Pause Toggle
       playBtn.addEventListener('click', () => {
@@ -220,20 +276,7 @@ function setupControls() {
         }
       });
 
-      // Mute / Unmute Toggle
-      muteBtn.addEventListener('click', () => {
-        if (player.isMuted()) {
-          player.unMute();
-          muteBtn.textContent = '🔊';
-          volumeSlider.value = player.getVolume() || 100;
-        } else {
-          player.mute();
-          muteBtn.textContent = '🔇';
-          volumeSlider.value = 0;
-        }
-      });
-
-      // Volume Slider
+      // Volume Slider (Vertical)
       volumeSlider.addEventListener('input', (e) => {
         const vol = parseInt(e.target.value, 10);
         player.setVolume(vol);
@@ -263,14 +306,21 @@ function setupControls() {
           ccBtn.classList.remove('active');
         }
       });
+
+      // Dismiss volume popup when clicking/tapping elsewhere
+      document.addEventListener('click', (e) => {
+        if (!volContainer.contains(e.target)) {
+          volContainer.classList.remove('show-slider');
+        }
+      });
     }
 
     function onPlayerStateChange(event) {
       const playBtn = document.getElementById('play-pause-btn');
       if (event.data === YT.PlayerState.PLAYING) {
-        playBtn.textContent = '⏸ Pause';
+        playBtn.textContent = '⏸';
       } else {
-        playBtn.textContent = '▶ Play';
+        playBtn.textContent = '▶';
       }
     }
   </script>
